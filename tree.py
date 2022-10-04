@@ -1,5 +1,4 @@
 from data import Dataset
-import numpy as np
 from tqdm import tqdm
 from log import enable_global_logging_config, logger as logging
 
@@ -14,27 +13,24 @@ class ConceptNode:
     def set_sub_words(self, words):
         self.sub_words = words
 
-    def generate_children(self, k=10):
-        words_with_weights = []
-        # for word in tqdm(self.sub_words):
-        #     words_with_weights.append((-sum(dataset.generate_one_hot_vector(word)), word))
+    def generate_children(self, k=15):
         for word in self.sub_words[:k]:
+            pbar.update(1)
             self.children.append(ConceptNode(word, self.level + 1))
 
     def allocate_sub_words(self):
         sub_words = {}
-        mat = []
+
         for child in self.children:
             sub_words[child.word] = []
-            mat.append(dataset.onehot_vectors[child.word])
-        mat = np.array(mat)
 
         for word in self.sub_words:
             if word in sub_words:
                 continue
-            vec = dataset.onehot_vectors[word]
-            temp = np.matmul(mat, vec)
-            index = np.argmax(temp)
+            co_occur = []
+            for child in self.children:
+                co_occur.append(dataset.calculate_co_occurrence_by_invert_index(word, child.word))
+            index = co_occur.index(max(co_occur))
             sub_words[self.children[index].word].append(word)
 
         for child in self.children:
@@ -52,11 +48,10 @@ class ConceptNode:
 if __name__ == '__main__':
     enable_global_logging_config()
     dataset = Dataset()
-    dataset.generate_all_onehot_vectors()
-    dataset.generate_adjacency_matrix()
-    dataset.sort_keywords()
+    pbar = tqdm(total=len(dataset.keywords), desc='generate_concept_nodes')
     root = ConceptNode('root')
     root.set_sub_words(dataset.keywords)
     root.generate_children()
     root.allocate_sub_words()
     root.visualize()
+    pbar.close()
