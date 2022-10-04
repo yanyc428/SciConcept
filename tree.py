@@ -16,9 +16,9 @@ class ConceptNode:
 
     def generate_children(self, k=10):
         words_with_weights = []
-        for word in tqdm(self.sub_words):
-            words_with_weights.append((-sum(dataset.generate_one_hot_vector(word)), word))
-        for weight, word in sorted(words_with_weights)[:k]:
+        # for word in tqdm(self.sub_words):
+        #     words_with_weights.append((-sum(dataset.generate_one_hot_vector(word)), word))
+        for word in self.sub_words[:k]:
             self.children.append(ConceptNode(word, self.level + 1))
 
     def allocate_sub_words(self):
@@ -26,24 +26,21 @@ class ConceptNode:
         mat = []
         for child in self.children:
             sub_words[child.word] = []
-            mat.append(dataset.generate_one_hot_vector(child.word))
+            mat.append(dataset.onehot_vectors[child.word])
         mat = np.array(mat)
 
         for word in self.sub_words:
             if word in sub_words:
                 continue
-            vec = dataset.generate_one_hot_vector(word)
+            vec = dataset.onehot_vectors[word]
             temp = np.matmul(mat, vec)
             index = np.argmax(temp)
             sub_words[self.children[index].word].append(word)
 
         for child in self.children:
             child.set_sub_words(sub_words[child.word])
-
-        if self.level < 3:
-            for child in self.children:
-                child.generate_children()
-                child.allocate_sub_words()
+            child.generate_children()
+            child.allocate_sub_words()
 
     def visualize(self):
         logging.info('\t' * self.level + '{}'.format(self.word))
@@ -55,6 +52,9 @@ class ConceptNode:
 if __name__ == '__main__':
     enable_global_logging_config()
     dataset = Dataset()
+    dataset.generate_all_onehot_vectors()
+    dataset.generate_adjacency_matrix()
+    dataset.sort_keywords()
     root = ConceptNode('root')
     root.set_sub_words(dataset.keywords)
     root.generate_children()
