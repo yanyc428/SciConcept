@@ -3,29 +3,58 @@ import numpy as np
 from tqdm import tqdm
 from collections import Counter
 import csv
+import pickle
 
 
 class Dataset:
-    def __init__(self, file=None):
+    def __init__(self, file=None, mode='a'):
         self.data = pd.read_csv('data.csv').astype('str')
-        self.keywords = set()
-        self.sorted_keywords = []
         with open('stopwords.txt', 'r') as f:
             self.stopwords = set([line.strip() for line in f.readlines()])
-        self.adjacency_matrix = None
-        self.total_words = 1000
-        self.id2word = {}
-        self.word2id = {}
-        if file:
-            self.load_keywords_from_file(file)
-        else:
-            self.extract_all_keywords()
-        self.generate_mapping_dicts()
-        self.invert_index = {}
-        self.generate_invert_index()
-        self.generate_adjacency_matrix()
-        self.export_adjacency_matrix()
-        self.sort_keywords()
+
+        if mode == 'r' or mode == 'a':
+            with open('keywords.pkl', 'rb') as f:
+                self.keywords = pickle.load(f)
+            with open('adjacency_matrix.pkl', 'rb') as f:
+                self.adjacency_matrix = pickle.load(f)
+            with open('total_words.pkl', 'rb') as f:
+                self.total_words = pickle.load(f)
+            with open('id2word.pkl', 'rb') as f:
+                self.id2word = pickle.load(f)
+            with open('word2id.pkl', 'rb') as f:
+                self.word2id = pickle.load(f)
+            with open('invert_index.pkl', 'rb') as f:
+                self.invert_index = pickle.load(f)
+        elif mode == 'w':
+            self.keywords = set()
+            self.adjacency_matrix = None
+            self.total_words = 1000
+            self.id2word = {}
+            self.word2id = {}
+            self.invert_index = {}
+            if file:
+                self.load_keywords_from_file(file)
+            else:
+                self.extract_all_keywords()
+            self.generate_mapping_dicts()
+            self.generate_invert_index()
+            self.generate_adjacency_matrix()
+            self.export_adjacency_matrix()
+            self.sort_keywords()
+
+        if mode == 'w' or mode == 'a':
+            with open('keywords.pkl', 'wb') as f:
+                pickle.dump(self.keywords, f)
+            with open('adjacency_matrix.pkl', 'wb') as f:
+                pickle.dump(self.adjacency_matrix, f)
+            with open('total_words.pkl', 'wb') as f:
+                pickle.dump(self.total_words, f)
+            with open('id2word.pkl', 'wb') as f:
+                pickle.dump(self.id2word, f)
+            with open('word2id.pkl', 'wb') as f:
+                pickle.dump(self.word2id, f)
+            with open('invert_index.pkl', 'wb') as f:
+                pickle.dump(self.invert_index, f)
 
     def extract_all_keywords(self):
         keywords = []
@@ -111,4 +140,3 @@ if __name__ == '__main__':
     print(data.get_frequency('贝叶斯网络'))
     print(data.calculate_adjacency_degree('贝叶斯网络'))
     print(data.calculate_adjacency_degree('贝叶斯网络', with_weight=True))
-

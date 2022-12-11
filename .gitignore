@@ -6,3 +6,4 @@ stopwords.txt
 __pycache__
 result
 keywords.txt
+*.pkl

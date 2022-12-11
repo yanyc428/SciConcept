@@ -73,7 +73,7 @@ class ConceptNode:
 
 if __name__ == '__main__':
     enable_global_logging_config()
-    dataset = Dataset()
+    dataset = Dataset(mode='w')
     pbar = tqdm(total=len(dataset.keywords), desc='generate_concept_nodes')
     root = ConceptNode('root')
     root.set_sub_words(dataset.keywords)
