@@ -9,14 +9,40 @@ class ConceptNode:
         self.children = []
         self.sub_words = []
         self.level = level
+        self.scores = {}
 
     def set_sub_words(self, words):
         self.sub_words = words
+        self._sort_sub_words_by_degree()
+
+    def _sort_sub_words_by_degree(self):
+        self.sub_words = list(sorted(
+            self.sub_words,
+            key=lambda x: dataset.calculate_adjacency_degree(x),
+            reverse=True
+        ))
 
     def generate_children(self, k=15):
-        for word in self.sub_words[:k]:
+        while len(self.children) <= k:
+            self.update_scores()
+            sorted_sub_words = sorted(self.sub_words, key=lambda x: self.scores[x], reverse=True)
+
+            for child in self.children:
+                sorted_sub_words.remove(child.word)
+
+            if len(sorted_sub_words) == 0:
+                return
+
+            self.children.append(ConceptNode(sorted_sub_words[0], self.level + 1))
             pbar.update(1)
-            self.children.append(ConceptNode(word, self.level + 1))
+
+    def update_scores(self):
+        for word in self.sub_words:
+            self.scores[word] = dataset.calculate_adjacency_degree(word, with_weight=True)
+            for child in self.children:
+                self.scores[word] -= dataset.get_co_occurrence(word, child.word)
+            duplicate = len(set(self.word) & set(word)) + 1
+            self.scores[word] *= duplicate
 
     def allocate_sub_words(self):
         sub_words = {}
