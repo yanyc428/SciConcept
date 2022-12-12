@@ -10,6 +10,8 @@ class ConceptNode:
         self.sub_words = []
         self.level = level
         self.scores = {}
+        if word != 'root':
+            pbar.update(1)
 
     def set_sub_words(self, words):
         self.sub_words = words
@@ -22,27 +24,24 @@ class ConceptNode:
             reverse=True
         ))
 
-    def generate_children(self, k=15):
+    def generate_children(self, k=10):
         while len(self.children) <= k:
             self.update_scores()
             sorted_sub_words = sorted(self.sub_words, key=lambda x: self.scores[x], reverse=True)
-
             for child in self.children:
                 sorted_sub_words.remove(child.word)
-
             if len(sorted_sub_words) == 0:
                 return
-
             self.children.append(ConceptNode(sorted_sub_words[0], self.level + 1))
-            pbar.update(1)
 
     def update_scores(self):
         for word in self.sub_words:
             self.scores[word] = dataset.calculate_adjacency_degree(word, with_weight=True)
             for child in self.children:
                 self.scores[word] -= dataset.get_co_occurrence(word, child.word)
-            duplicate = len(set(self.word) & set(word)) + 1
-            self.scores[word] *= duplicate
+            if self.word != 'root':
+                duplicate = len(set(self.word) & set(word)) + 1
+                self.scores[word] *= duplicate
 
     def allocate_sub_words(self):
         sub_words = {}
@@ -56,6 +55,8 @@ class ConceptNode:
             co_occur = []
             for child in self.children:
                 co_occur.append(dataset.calculate_co_occurrence_by_invert_index(word, child.word))
+            if max(co_occur) == 0:
+                continue
             index = co_occur.index(max(co_occur))
             sub_words[self.children[index].word].append(word)
 
@@ -70,14 +71,23 @@ class ConceptNode:
             for child in self.children:
                 child.visualize()
 
+    def search(self, keyword, path=()):
+        if self.word == keyword:
+            return path + (self.word,)
+        for child in self.children:
+            res = child.search(keyword, path + (self.word,))
+            if res:
+                return res
+
 
 if __name__ == '__main__':
     enable_global_logging_config()
-    dataset = Dataset(mode='w')
+    dataset = Dataset(ckpt='ckpt2', mode='r')
     pbar = tqdm(total=len(dataset.keywords), desc='generate_concept_nodes')
     root = ConceptNode('root')
     root.set_sub_words(dataset.keywords)
     root.generate_children()
     root.allocate_sub_words()
-    root.visualize()
+    # root.visualize()
+    print(root.search('需求变更'))
     pbar.close()
