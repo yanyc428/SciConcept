@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -7,28 +9,28 @@ import pickle
 
 
 class Dataset:
-    def __init__(self, file=None, mode='a'):
+    def __init__(self, file=None, ckpt='ckpt1', mode='w'):
         self.data = pd.read_csv('data.csv').astype('str')
         with open('stopwords.txt', 'r') as f:
             self.stopwords = set([line.strip() for line in f.readlines()])
 
         if mode == 'r' or mode == 'a':
-            with open('keywords.pkl', 'rb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'keywords.pkl'), 'rb') as f:
                 self.keywords = pickle.load(f)
-            with open('adjacency_matrix.pkl', 'rb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'adjacency_matrix.pkl'), 'rb') as f:
                 self.adjacency_matrix = pickle.load(f)
-            with open('total_words.pkl', 'rb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'total_words.pkl'), 'rb') as f:
                 self.total_words = pickle.load(f)
-            with open('id2word.pkl', 'rb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'id2word.pkl'), 'rb') as f:
                 self.id2word = pickle.load(f)
-            with open('word2id.pkl', 'rb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'word2id.pkl'), 'rb') as f:
                 self.word2id = pickle.load(f)
-            with open('invert_index.pkl', 'rb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'invert_index.pkl'), 'rb') as f:
                 self.invert_index = pickle.load(f)
         elif mode == 'w':
             self.keywords = set()
             self.adjacency_matrix = None
-            self.total_words = 1000
+            self.total_words = 10000
             self.id2word = {}
             self.word2id = {}
             self.invert_index = {}
@@ -36,24 +38,26 @@ class Dataset:
                 self.load_keywords_from_file(file)
             else:
                 self.extract_all_keywords()
+            self.total_words = len(self.keywords)
             self.generate_mapping_dicts()
             self.generate_invert_index()
             self.generate_adjacency_matrix()
-            self.export_adjacency_matrix()
+
             self.sort_keywords()
 
+        self.export_adjacency_matrix()
         if mode == 'w' or mode == 'a':
-            with open('keywords.pkl', 'wb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'keywords.pkl'), 'wb') as f:
                 pickle.dump(self.keywords, f)
-            with open('adjacency_matrix.pkl', 'wb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'adjacency_matrix.pkl'), 'wb') as f:
                 pickle.dump(self.adjacency_matrix, f)
-            with open('total_words.pkl', 'wb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'total_words.pkl'), 'wb') as f:
                 pickle.dump(self.total_words, f)
-            with open('id2word.pkl', 'wb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'id2word.pkl'), 'wb') as f:
                 pickle.dump(self.id2word, f)
-            with open('word2id.pkl', 'wb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'word2id.pkl'), 'wb') as f:
                 pickle.dump(self.word2id, f)
-            with open('invert_index.pkl', 'wb') as f:
+            with open(os.path.join('checkpoints', ckpt, 'invert_index.pkl'), 'wb') as f:
                 pickle.dump(self.invert_index, f)
 
     def extract_all_keywords(self):
@@ -115,6 +119,8 @@ class Dataset:
         return len(set1 & set2)
 
     def get_frequency(self, keyword):
+        if keyword not in self.keywords:
+            return -1
         i = self.word2id[keyword]
         return self.adjacency_matrix[i, i]
 
@@ -136,7 +142,7 @@ class Dataset:
 
 
 if __name__ == '__main__':
-    data = Dataset()
+    data = Dataset('keywords.txt', mode='r', ckpt='ckpt2')
     print(data.get_frequency('贝叶斯网络'))
     print(data.calculate_adjacency_degree('贝叶斯网络'))
     print(data.calculate_adjacency_degree('贝叶斯网络', with_weight=True))
