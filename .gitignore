@@ -7,3 +7,12 @@ __pycache__
 result
 keywords.txt
 *.pkl
+*.ckpt
+*.sqlite
+*.npy
+build
+static
+index.html
+yuanhui.png
+tree.tmp
+sci_concept.egg-info

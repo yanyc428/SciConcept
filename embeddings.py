@@ -9,15 +9,12 @@
 from gensim.models import word2vec
 import jieba
 from tqdm import tqdm
-jieba.load_userdict('keywords.txt')
 
 
 class DataSet:
-    def __init__(self, df, keywords):
+    def __init__(self, df):
         self.df = df
         self.pbar = tqdm(total=len(self) * 6, desc='Training W2v embeddings')
-        self.keywords = keywords
-        self.words = set()
 
     def __len__(self):
         return len(self.df)
@@ -32,18 +29,19 @@ class DataSet:
 
 
 class W2V:
-    def __init__(self, train_csv=None, keywords=None):
+    def __init__(self, path, train_csv=None):
+        self.path = path
         if train_csv is not None:
-            self._train(DataSet(train_csv, keywords))
+            self._train(DataSet(train_csv))
         else:
             self._load()
 
     def _load(self):
-        self.model = word2vec.Word2Vec.load('w2v.ckpt')
+        self.model = word2vec.Word2Vec.load(self.path)
 
     def _train(self, it):
         self.model = word2vec.Word2Vec(it, min_count=1, vector_size=128)
-        self.model.save('w2v.ckpt')
+        self.model.save(self.path)
 
     def similarity(self, word1, word2):
         try:
@@ -52,10 +50,10 @@ class W2V:
             return 0
 
     def most_similar(self, word):
-        return self.model.wv.similar_by_word(word, topn=1)
+        return self.model.wv.similar_by_word(word, topn=20)
 
 
 if __name__ == '__main__':
-    w2v = W2V()
+    w2v = W2V('w2v.ckpt')
     print(w2v.model.wv.similarity('光纤通信', '用户程序'))
     print(w2v.most_similar('光纤通信'))
