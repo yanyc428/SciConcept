@@ -75,7 +75,7 @@ class ConceptNode:
             if punish:
                 for child in self.children:
                     self.topology_scores[word] -= self.tree.dataset.get_co_occurrence(word, child.word)
-                    self.semantic_scores[word] *= (1 - self.tree.dataset.get_semantic_similarity(word, child.word))
+                    self.semantic_scores[word] -= self.tree.dataset.get_semantic_similarity(word, child.word)
             if consider_duplicate:
                 duplicate = len(set(self.word) & set(word)) + 1
                 self.topology_scores[word] *= duplicate

@@ -255,7 +255,7 @@ def add(name, data, keywords):
     except Exception as e:
         print(e)
         session = Session()
-        ds = session.query(DaS).filter_by(name=args.ckpt).first()
+        ds = session.query(DaS).filter_by(name).first()
         ds.status = '导入失败'
         session.commit()
 
