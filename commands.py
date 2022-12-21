@@ -10,6 +10,7 @@ import os
 
 
 def main():
+    os.system('python database.py')
     while True:
         option = input('sci-concept >> ')
         if option.strip() == '':
