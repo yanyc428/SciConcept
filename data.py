@@ -79,8 +79,8 @@ class Dataset:
             self.adjacency_matrix = None
             self.semantic_matrix = None
             self._generate_adjacency_matrix()
-            self.export_adjacency_matrix()
-            self.export_adjacency_matrix(semantic=True)
+            # self.export_adjacency_matrix()
+            # self.export_adjacency_matrix(semantic=True)
 
             with open(os.path.join('checkpoints', ckpt, 'keywords.pkl'), 'wb') as f:
                 pickle.dump(self.keywords, f)

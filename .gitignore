@@ -1,7 +1,6 @@
 log
 .DS_Store
 data.csv
-stopwords.txt
 .idea
 __pycache__
 result
