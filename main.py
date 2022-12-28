@@ -8,10 +8,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.responses import JSONResponse
 from database import *
 from tree import ConceptTree
-import pandas as pd
 import os
 from pydantic import BaseModel
-from typing import List, Union
+from typing import Union
 
 app = FastAPI()  # 实例化fastapi
 app.mount('/static', StaticFiles(directory="static"), 'static')

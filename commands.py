@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-@Project    : SciConcept
-@File       : commands
-@Email      : yanyuchen@zju.edu.cn
-@Author     : Yan Yuchen
-@Time       : 2022/12/20 20:53
-"""
 import os
 
 

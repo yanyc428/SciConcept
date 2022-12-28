@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-@Project    : SciConcept
-@File       : database
-@Email      : yanyuchen@zju.edu.cn
-@Author     : Yan Yuchen
-@Time       : 2022/12/14 23:07
-"""
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date

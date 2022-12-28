@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-@Project    : SciConcept
-@File       : setup
-@Email      : yanyuchen@zju.edu.cn
-@Author     : Yan Yuchen
-@Time       : 2022/12/20 21:59
-"""
 from setuptools import setup
 
 setup(

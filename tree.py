@@ -1,5 +1,4 @@
 import click
-
 from data import Dataset
 from tqdm import tqdm
 from sklearn.preprocessing import StandardScaler

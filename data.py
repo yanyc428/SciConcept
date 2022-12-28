@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 import os
-
 import click
 import pandas as pd
 import numpy as np

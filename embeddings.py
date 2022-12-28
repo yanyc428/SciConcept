@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-@Project    : SciConcept
-@File       : embeddings
-@Email      : yanyuchen@zju.edu.cn
-@Author     : Yan Yuchen
-@Time       : 2022/12/12 20:59
-"""
 from gensim.models import word2vec
 import jieba
 from tqdm import tqdm
