@@ -6,7 +6,23 @@ Sci-Concept提供了一键安装方式，在命令行输入以下命令即可完
 pip install .
 ```
 
-## 二、使用
+## 二、代码架构
+
+```
+.
+├── README.md         说明文件
+├── commands.py       命令行程序入口
+├── data.py           数据处理文件
+├── database.py       数据库处理文件
+├── embeddings.py     词向量文件
+├── log.py            日志文件
+├── main.py           Web API文件
+├── setup.py          程序安装入口
+├── stopwords.txt     停用词
+└── tree.py           层次概念体系文件
+```
+
+## 三、使用
 在安装后，直接调用以下命令即可进入sci-concept终端：
 ```bash
 sci-concept

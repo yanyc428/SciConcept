@@ -102,7 +102,8 @@ class ConceptNode:
                 continue
             co_occur = []
             for child in self.children:
-                co_occur.append(self.tree.dataset.get_co_occurrence(word, child.word))
+                duplicate = len(set(word) & set(child.word)) + 1
+                co_occur.append(self.tree.dataset.get_co_occurrence(word, child.word) * duplicate)
             if len(co_occur) == 0:
                 return
             # if max(co_occur) == 0:
@@ -173,7 +174,7 @@ def search(word, semantic):
                 print('Path containing {}:'.format(word))
                 for index, item in enumerate(tree.search(word)):
                     # item = [i.replace(word, f'*{word}*') for i in item]
-                    print('{}. {}'.format(index + 1, ' -> '.join(item)))
+                    print('{}. {} (g=1/{}) '.format(index + 1, ' -> '.join(item), len(item)-1))
 
             for keyword, _ in tree.dataset.w2v.most_similar(word):
                 print()
@@ -182,7 +183,7 @@ def search(word, semantic):
                     print(f'Similar word {i}: ', word)
                     for index, item in enumerate(tree.search(word)):
                         # item = [i.replace(word, f'*{word}*') for i in item]
-                        print('{}. {}'.format(index + 1, ' -> '.join(item)))
+                        print('{}. {} (g=1/{})'.format(index + 1, ' -> '.join(item), len(item)-1))
                     i += 1
                     if i > semantic:
                         return
@@ -193,7 +194,7 @@ def search(word, semantic):
         print('Path containing {}:'.format(word))
         for index, item in enumerate(tree.search(word)):
             # item = [i.replace(word, f'*{word}*') for i in item]
-            print('{}. {}'.format(index+1, ' -> '.join(item)))
+            print('{}. {} (g=1/{})'.format(index+1, ' -> '.join(item), len(item)-1))
 
 
 if __name__ == '__main__':
